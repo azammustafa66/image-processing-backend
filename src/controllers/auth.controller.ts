@@ -11,18 +11,13 @@ const isMobileClient = (req: Request) =>
   req.useragent?.isMobile || req.header('X-Client-Type') === 'mobile';
 
 export const register = asyncHandler(async (req, res) => {
-  const { email, name, password } = req.body as {
-    email?: string;
-    name?: string;
-    password?: string;
-  };
-  if (!email || !name || !password) throw new APIError(400, 'Please fill in all the details');
+  const { email, name, password } = req.body as { email: string; name: string; password: string };
 
   const doesExist = await User.findOne({ email });
   if (doesExist) throw new APIError(409, 'User already exists. Please login.');
 
   const created = await User.create({ name, email, password });
-  const { hashedToken, unhashedToken, tempTokenExpiry } = created.generateTempTokens();
+  const { hashedToken, unhashedToken: _unhashedToken, tempTokenExpiry } = created.generateTempTokens();
   const accessToken = created.generateAccessToken();
   const refreshToken = created.generateRefreshToken();
 
@@ -58,8 +53,7 @@ export const register = asyncHandler(async (req, res) => {
 });
 
 export const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body as { email?: string; password?: string };
-  if (!email || !password) throw new APIError(400, 'Provide all the required details');
+  const { email, password } = req.body as { email: string; password: string };
 
   const user = await User.findOne({ email });
   if (!user) throw new APIError(400, 'User does not exist. Please register');
@@ -178,8 +172,7 @@ export const resendEmailVerification = asyncHandler(async (req: AuthenticatedReq
 });
 
 export const forgotPassword = asyncHandler(async (req, res) => {
-  const { email } = req.body as { email?: string };
-  if (!email) throw new APIError(400, 'Please send valid credentials');
+  const { email } = req.body as { email: string };
 
   const user = await User.findOne({ email });
   if (!user) throw new APIError(400, 'User with the email does not exist');
@@ -197,8 +190,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 
 export const resetPassword = asyncHandler(async (req, res) => {
   const { forgotPasswordToken } = req.params as { forgotPasswordToken: string };
-  const { password: newPassword } = req.body as { password?: string };
-  if (!newPassword) throw new APIError(400, 'Password is required to change existing one');
+  const { password: newPassword } = req.body as { password: string };
 
   const hashed = crypto.createHash('sha512').update(forgotPasswordToken).digest('hex');
   const user = await User.findOne({
