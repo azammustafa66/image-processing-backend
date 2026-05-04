@@ -17,7 +17,11 @@ export const register = asyncHandler(async (req, res) => {
   if (doesExist) throw new APIError(409, 'User already exists. Please login.');
 
   const created = await User.create({ name, email, password });
-  const { hashedToken, unhashedToken: _unhashedToken, tempTokenExpiry } = created.generateTempTokens();
+  const {
+    hashedToken,
+    unhashedToken: _unhashedToken,
+    tempTokenExpiry,
+  } = created.generateTempTokens();
   const accessToken = created.generateAccessToken();
   const refreshToken = created.generateRefreshToken();
 

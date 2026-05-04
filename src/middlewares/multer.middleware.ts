@@ -27,7 +27,12 @@ export const upload = multer({
     if (ALLOWED_MIME_TYPES.includes(file.mimetype as ImageMimeType)) {
       cb(null, true);
     } else {
-      cb(new APIError(415, `Unsupported file type: ${file.mimetype}. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`));
+      cb(
+        new APIError(
+          415,
+          `Unsupported file type: ${file.mimetype}. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`,
+        ),
+      );
     }
   },
 });

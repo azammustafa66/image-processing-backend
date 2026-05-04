@@ -50,7 +50,11 @@ export interface TransformationConfig {
   quality?: number;
   compress?: boolean;
   filters?: { grayscale?: boolean; sepia?: boolean };
-  watermark?: { text: string; position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'; opacity: number };
+  watermark?: {
+    text: string;
+    position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
+    opacity: number;
+  };
 }
 
 export interface ITransformedImage extends Document {
@@ -62,7 +66,6 @@ export interface ITransformedImage extends Document {
   width: number;
   height: number;
 }
-
 
 export type TemporaryToken = {
   unhashedToken: string;

@@ -72,7 +72,10 @@ export const transformImage = asyncHandler(async (req: AuthenticatedRequest, res
   if (!image) throw new APIError(404, 'Image not found');
 
   // deterministic cache key — same image + same config always hits the same key
-  const hash = crypto.createHash('sha256').update(JSON.stringify(transformations, Object.keys(transformations).sort())).digest('hex');
+  const hash = crypto
+    .createHash('sha256')
+    .update(JSON.stringify(transformations, Object.keys(transformations).sort()))
+    .digest('hex');
   const cacheKey = `transform:${id}:${hash}`;
   const cached = await client.get(cacheKey);
 

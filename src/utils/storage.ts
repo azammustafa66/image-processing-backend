@@ -12,11 +12,7 @@ export const s3 = new S3Client({
 
 const BUCKET = process.env.STORAGE_BUCKET!;
 
-export async function uploadFile(
-  buffer: Buffer,
-  key: string,
-  mimetype: string,
-): Promise<string> {
+export async function uploadFile(buffer: Buffer, key: string, mimetype: string): Promise<string> {
   const upload = new Upload({
     client: s3,
     params: {
