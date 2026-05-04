@@ -1,9 +1,10 @@
+import crypto from 'crypto';
 import sharp from 'sharp';
 
 import { Image } from '../models/image.model';
 import { TransformedImage } from '../models/transformedimage.model';
 import type { AuthenticatedRequest, ImageMimeType, TransformationConfig } from '../types';
-import { APIError, APIResponse, asyncHandler, deleteFile, uploadFile } from '../utils';
+import { APIError, APIResponse, asyncHandler, client, deleteFile, uploadFile } from '../utils';
 
 // ─── Upload ───────────────────────────────────────────────────────────────────
 
@@ -71,10 +72,14 @@ export const transformImage = asyncHandler(async (req: AuthenticatedRequest, res
   if (!image) throw new APIError(404, 'Image not found');
 
   // deterministic cache key — same image + same config always hits the same key
-  // TODO: const hash = createHash('sha256').update(JSON.stringify(transformations, Object.keys(transformations).sort())).digest('hex');
-  // TODO: const cacheKey = `transform:${id}:${hash}`;
-  // TODO: const cached = await Bun.redis.get(cacheKey);
-  // TODO: if (cached) return res.json(new APIResponse(200, { url: cached }, 'From cache'));
+  const hash = crypto.createHash('sha256').update(JSON.stringify(transformations, Object.keys(transformations).sort())).digest('hex');
+  const cacheKey = `transform:${id}:${hash}`;
+  const cached = await client.get(cacheKey);
+
+  if (cached) {
+    res.set('X-Cache', 'HIT');
+    return res.json(new APIResponse(200, { url: cached }, 'From cache'));
+  }
 
   const response = await fetch(image.originalURL);
   const originalBuffer = Buffer.from(await response.arrayBuffer());
@@ -138,7 +143,7 @@ export const transformImage = asyncHandler(async (req: AuthenticatedRequest, res
   const resultKey = `transforms/${image.owner.toString('hex')}/${image._id}/${Date.now()}.${outputFormat}`;
   const resultURL = await uploadFile(resultBuffer, resultKey, `image/${outputFormat}`);
 
-  // TODO: await Bun.redis.set(cacheKey, resultURL, { ex: 86400 });
+  await client.set(cacheKey, resultURL, { EX: 86400 });
 
   const transformed = await TransformedImage.create({
     originalImage: image._id,
@@ -150,6 +155,7 @@ export const transformImage = asyncHandler(async (req: AuthenticatedRequest, res
     height,
   });
 
+  res.set('X-Cache', 'MISS');
   return res.status(200).json(new APIResponse(200, transformed, 'Image transformed successfully'));
 });
 

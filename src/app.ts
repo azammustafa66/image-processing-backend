@@ -16,6 +16,7 @@ app.use(
     credentials: true,
     methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Client-Type'],
+    exposedHeaders: ['X-Cache'],
   }),
   cookieParser(),
   userAgent.express(),
