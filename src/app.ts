@@ -1,10 +1,10 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { type NextFunction, type Request, type Response } from 'express';
+import multer from 'multer';
 import * as userAgent from 'express-useragent';
 
 import mainRouter from './routes';
-import type { APIError } from './utils';
 
 const app = express();
 
@@ -23,7 +23,10 @@ app.use(
 
 app.use('/api/v1', mainRouter);
 
-app.use((err: APIError, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ success: false, message: err.message, errors: [] });
+  }
   return res.status(err.statusCode ?? 500).json({
     success: false,
     message: err.message ?? 'Internal Server Error',

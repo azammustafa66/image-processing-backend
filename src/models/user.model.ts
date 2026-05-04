@@ -32,7 +32,7 @@ userSchema.method('isPasswordValid', async function (password: string) {
 
 userSchema.method('generateAccessToken', function () {
   return jwt.sign(
-    { _id: this._id.toString(), email: this.email },
+    { _id: this._id.toString('hex'), email: this.email },
     process.env.ACCESS_TOKEN_SECRET as string,
     {
       expiresIn: '15m',
@@ -41,7 +41,7 @@ userSchema.method('generateAccessToken', function () {
 });
 
 userSchema.method('generateRefreshToken', function () {
-  return jwt.sign({ _id: this._id.toString() }, process.env.REFRESH_TOKEN_SECRET as string, {
+  return jwt.sign({ _id: this._id.toString('hex') }, process.env.REFRESH_TOKEN_SECRET as string, {
     expiresIn: '10d',
   });
 });
