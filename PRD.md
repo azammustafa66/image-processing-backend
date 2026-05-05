@@ -2,8 +2,8 @@
 
 ## Image Processing Backend Service
 
-**Version:** 1.2  
-**Date:** 2026-05-05  
+**Version:** 1.2
+**Date:** 2026-05-05
 **Status:** Complete
 
 ---
@@ -35,20 +35,20 @@ A RESTful backend service for image upload, transformation, and retrieval — si
 
 ## 4. Tech Stack
 
-| Concern          | Choice                                         |
-| ---------------- | ---------------------------------------------- |
-| Runtime          | Bun                                            |
-| Framework        | Express.js v5                                  |
-| Database         | MongoDB (Mongoose v9)                          |
-| Image Processing | Sharp                                          |
-| Cloud Storage    | AWS S3                                         |
+| Concern          | Choice                                          |
+| ---------------- | ----------------------------------------------- |
+| Runtime          | Bun                                             |
+| Framework        | Express.js v5                                   |
+| Database         | MongoDB (Mongoose v9)                           |
+| Image Processing | Sharp                                           |
+| Cloud Storage    | AWS S3                                          |
 | Auth             | JWT — access token (15m) + refresh token (10d) |
-| Caching          | Redis (npm redis package)                      |
-| Rate Limiting    | express-rate-limit                             |
-| File Upload      | Multer (memory storage)                        |
-| Validation       | Zod v4                                         |
-| Password Hashing | bcryptjs (cost 10)                             |
-| Email            | Nodemailer + Mailtrap + BullMQ queue           |
+| Caching          | Redis (npm redis package)                       |
+| Rate Limiting    | express-rate-limit                              |
+| File Upload      | Multer (memory storage)                         |
+| Validation       | Zod v4                                          |
+| Password Hashing | bcryptjs (cost 10)                              |
+| Email            | Nodemailer + Mailtrap + BullMQ queue            |
 
 ---
 
@@ -75,17 +75,17 @@ Express API  (Bun runtime)
 
 ### User (Mongoose)
 
-| Field                        | Type           | Notes                          |
-| ---------------------------- | -------------- | ------------------------------ |
-| name                         | String         | required                       |
-| email                        | String         | required, unique, indexed      |
-| password                     | String         | bcrypt hashed, pre-save hook   |
-| isEmailVerified              | Boolean        | default false                  |
-| emailVerificationToken       | String \| null | SHA-512 hashed                 |
-| emailVerificationTokenExpiry | Date \| null   | 20 min TTL                     |
-| forgotPasswordToken          | String \| null | SHA-512 hashed                 |
-| forgotPasswordTokenExpiry    | Date \| null   | 20 min TTL                     |
-| refreshToken                 | String \| null | stored for rotation/revocation |
+| Field                        | Type          | Notes                          |
+| ---------------------------- | ------------- | ------------------------------ |
+| name                         | String        | required                       |
+| email                        | String        | required, unique, indexed      |
+| password                     | String        | bcrypt hashed, pre-save hook   |
+| isEmailVerified              | Boolean       | default false                  |
+| emailVerificationToken       | String\| null | SHA-512 hashed                 |
+| emailVerificationTokenExpiry | Date\| null   | 20 min TTL                     |
+| forgotPasswordToken          | String\| null | SHA-512 hashed                 |
+| forgotPasswordTokenExpiry    | Date\| null   | 20 min TTL                     |
+| refreshToken                 | String\| null | stored for rotation/revocation |
 
 #### Instance methods
 
@@ -96,17 +96,17 @@ Express API  (Bun runtime)
 
 ### Image (Mongoose)
 
-| Field       | Type          | Notes                    |
-| ----------- | ------------- | ------------------------ |
-| owner       | ObjectId      | ref User                 |
-| originalURL | String        | AWS S3 URL               |
-| filename    | String        | Original filename        |
-| mimetype    | ImageMimeType | e.g. `image/jpeg`        |
-| size        | Number        | Bytes                    |
-| width       | Number        | Pixels                   |
-| height      | Number        | Pixels                   |
-| createdAt   | Date          | auto                     |
-| updatedAt   | Date          | auto                     |
+| Field       | Type          | Notes              |
+| ----------- | ------------- | ------------------ |
+| owner       | ObjectId      | ref User           |
+| originalURL | String        | AWS S3 URL         |
+| filename    | String        | Original filename  |
+| mimetype    | ImageMimeType | e.g.`image/jpeg` |
+| size        | Number        | Bytes              |
+| width       | Number        | Pixels             |
+| height      | Number        | Pixels             |
+| createdAt   | Date          | auto               |
+| updatedAt   | Date          | auto               |
 
 ### TransformedImage (Mongoose)
 
@@ -127,16 +127,16 @@ Express API  (Bun runtime)
 
 ### 7.1 Authentication — `/api/v1/auth`
 
-| Method | Endpoint                     | Auth | Description                  |
-| ------ | ---------------------------- | ---- | ---------------------------- |
-| POST   | `/register`                  | —    | Register, sends verify email |
-| POST   | `/login`                     | —    | Login                        |
-| POST   | `/refresh-token`             | —    | Rotate refresh token         |
-| POST   | `/logout`                    | ✓    | Logout                       |
-| PATCH  | `/verify-email/:token`       | —    | Verify email address         |
-| POST   | `/resend-email-verification` | ✓    | Resend verification email    |
-| POST   | `/forgot-password`           | —    | Request password reset       |
-| PATCH  | `/reset-password/:token`     | —    | Reset password               |
+| Method | Endpoint                       | Auth | Description                  |
+| ------ | ------------------------------ | ---- | ---------------------------- |
+| POST   | `/register`                  | —   | Register, sends verify email |
+| POST   | `/login`                     | —   | Login                        |
+| POST   | `/refresh-token`             | —   | Rotate refresh token         |
+| POST   | `/logout`                    | ✓   | Logout                       |
+| PATCH  | `/verify-email/:token`       | —   | Verify email address         |
+| POST   | `/resend-email-verification` | ✓   | Resend verification email    |
+| POST   | `/forgot-password`           | —   | Request password reset       |
+| PATCH  | `/reset-password/:token`     | —   | Reset password               |
 
 Refresh token is returned in `httpOnly` cookie for web clients, and additionally in the response body for mobile clients (`X-Client-Type: mobile` header or mobile User-Agent).
 
@@ -146,13 +146,13 @@ Refresh token is returned in `httpOnly` cookie for web clients, and additionally
 
 All image endpoints require `Authorization: Bearer <accessToken>`.
 
-| Method | Endpoint         | Description                                      |
-| ------ | ---------------- | ------------------------------------------------ |
-| GET    | `/`              | List images (paginated)                          |
-| POST   | `/`              | Upload image (multipart `image` field)           |
-| GET    | `/:id`           | Get image by ID                                  |
-| DELETE | `/:id`           | Delete image + all transforms from S3 and DB     |
-| POST   | `/:id/transform` | Transform image (rate limited, Redis cached)     |
+| Method | Endpoint           | Description                                  |
+| ------ | ------------------ | -------------------------------------------- |
+| GET    | `/`              | List images (paginated)                      |
+| POST   | `/`              | Upload image (multipart `image` field)     |
+| GET    | `/:id`           | Get image by ID                              |
+| DELETE | `/:id`           | Delete image + all transforms from S3 and DB |
+| POST   | `/:id/transform` | Transform image (rate limited, Redis cached) |
 
 **Upload:** `multipart/form-data`, field name `image`, max 25 MB. Supported types: `jpeg`, `png`, `webp`, `gif`, `tiff`, `avif`, `svg+xml`, `bmp`, `x-icon`.
 
@@ -162,26 +162,26 @@ All image endpoints require `Authorization: Bearer <accessToken>`.
 
 ### 7.3 Rate Limits
 
-| Endpoint                     | Limit               |
-| ---------------------------- | ------------------- |
+| Endpoint                       | Limit               |
+| ------------------------------ | ------------------- |
 | `POST /images/:id/transform` | 10 req / min per IP |
 
 ---
 
 ## 8. Transformation Reference
 
-| Key                 | Input                                                     | Notes                          |
-| ------------------- | --------------------------------------------------------- | ------------------------------ |
-| `resize`            | `{ width, height }`                                       | Fits within bounds, no enlarge |
-| `crop`              | `{ width, height, x, y }`                                 | Extracts region at (x, y)      |
-| `rotate`            | `number` (degrees)                                        | Non-90° angles fill background |
-| `flip`              | `boolean`                                                 | Vertical flip (top ↔ bottom)   |
-| `mirror`            | `boolean`                                                 | Horizontal flip (left ↔ right) |
-| `format`            | `"jpeg" \| "png" \| "webp" \| "gif" \| "tiff" \| "avif"` | Re-encode output               |
-| `quality`           | `1–100`                                                   | Lossy compression quality      |
-| `compress`          | `boolean`                                                 | Lossless mode                  |
-| `filters.grayscale` | `boolean`                                                 | Convert to grayscale           |
-| `filters.sepia`     | `boolean`                                                 | Sepia tone via recomb matrix   |
+| Key                   | Input                                                 | Notes                           |
+| --------------------- | ----------------------------------------------------- | ------------------------------- |
+| `resize`            | `{ width, height }`                                 | Fits within bounds, no enlarge  |
+| `crop`              | `{ width, height, x, y }`                           | Extracts region at (x, y)       |
+| `rotate`            | `number` (degrees)                                  | Non-90° angles fill background |
+| `flip`              | `boolean`                                           | Vertical flip (top ↔ bottom)   |
+| `mirror`            | `boolean`                                           | Horizontal flip (left ↔ right) |
+| `format`            | `"jpeg" \| "png" \| "webp" \| "gif" \| "tiff" \| "avif"` | Re-encode output                |
+| `quality`           | `1–100`                                            | Lossy compression quality       |
+| `compress`          | `boolean`                                           | Lossless mode                   |
+| `filters.grayscale` | `boolean`                                           | Convert to grayscale            |
+| `filters.sepia`     | `boolean`                                           | Sepia tone via recomb matrix    |
 
 ---
 
@@ -220,30 +220,30 @@ All image endpoints require `Authorization: Bearer <accessToken>`.
 
 ## 12. Environment Variables
 
-| Variable                | Description                          |
-| ----------------------- | ------------------------------------ |
-| `PORT`                  | Server port (default `3000`)         |
-| `CORS_ORIGIN`           | Comma-separated allowed origins      |
-| `MONGO_URI`             | MongoDB connection string            |
-| `ACCESS_TOKEN_SECRET`   | JWT signing secret for access tokens |
-| `ACCESS_TOKEN_EXPIRY`   | e.g. `15m`                           |
-| `REFRESH_TOKEN_SECRET`  | JWT signing secret for refresh tokens|
-| `REFRESH_TOKEN_EXPIRY`  | e.g. `10d`                           |
-| `REDIS_HOST`            | Redis host                           |
-| `REDIS_PORT`            | Redis port (default `6379`)          |
-| `REDIS_PASSWORD`        | Redis password                       |
-| `STORAGE_BUCKET`        | S3 bucket name                       |
-| `STORAGE_REGION`        | S3 region (default `us-east-1`)      |
-| `AWS_ACCESS_KEY_ID`     | AWS access key                       |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret key                       |
-| `MAX_UPLOAD_SIZE_MB`    | Upload size limit (default `25`)     |
-| `MAILTRAP_HOST`         | Mailtrap SMTP host                   |
-| `MAILTRAP_PORT`         | Mailtrap SMTP port (default `587`)   |
-| `MAILTRAP_USER`         | Mailtrap SMTP user                   |
-| `MAILTRAP_PASS`         | Mailtrap SMTP password               |
-| `MAILTRAP_FROM`         | Sender email address                 |
-| `APP_NAME`              | App name shown in emails             |
-| `APP_URL`               | Base URL used in email links         |
+| Variable                  | Description                           |
+| ------------------------- | ------------------------------------- |
+| `PORT`                  | Server port (default `3000`)        |
+| `CORS_ORIGIN`           | Comma-separated allowed origins       |
+| `MONGO_URI`             | MongoDB connection string             |
+| `ACCESS_TOKEN_SECRET`   | JWT signing secret for access tokens  |
+| `ACCESS_TOKEN_EXPIRY`   | e.g.`15m`                           |
+| `REFRESH_TOKEN_SECRET`  | JWT signing secret for refresh tokens |
+| `REFRESH_TOKEN_EXPIRY`  | e.g.`10d`                           |
+| `REDIS_HOST`            | Redis host                            |
+| `REDIS_PORT`            | Redis port (default `6379`)         |
+| `REDIS_PASSWORD`        | Redis password                        |
+| `STORAGE_BUCKET`        | S3 bucket name                        |
+| `STORAGE_REGION`        | S3 region (default `us-east-1`)     |
+| `AWS_ACCESS_KEY_ID`     | AWS access key                        |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key                        |
+| `MAX_UPLOAD_SIZE_MB`    | Upload size limit (default `25`)    |
+| `MAILTRAP_HOST`         | Mailtrap SMTP host                    |
+| `MAILTRAP_PORT`         | Mailtrap SMTP port (default `587`)  |
+| `MAILTRAP_USER`         | Mailtrap SMTP user                    |
+| `MAILTRAP_PASS`         | Mailtrap SMTP password                |
+| `MAILTRAP_FROM`         | Sender email address                  |
+| `APP_NAME`              | App name shown in emails              |
+| `APP_URL`               | Base URL used in email links          |
 
 ---
 

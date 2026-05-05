@@ -2,6 +2,8 @@
 
 A Cloudinary-like image processing backend built with Bun, Express, MongoDB, AWS S3, and Redis.
 
+> Project inspired by [roadmap.sh/projects/image-processing-service](https://roadmap.sh/projects/image-processing-service)
+
 ## Tech Stack
 
 - **Runtime** — Bun
