@@ -1,5 +1,7 @@
 import { Worker, Queue, type ConnectionOptions } from 'bullmq';
 
+import { sendMail } from '../utils';
+
 const connection: ConnectionOptions = {
   host: process.env.REDIS_HOST || '127.0.0.1',
   port: Number(process.env.REDIS_PORT) || 6379,
@@ -17,8 +19,9 @@ export const emailQueue = new Queue('EmailQueue', {
 export const emailWorker = new Worker(
   'EmailQueue',
   async (job) => {
-    const { to, message } = job.data;
-    console.log(`Sent ${message} to ${to}`);
+    const { to, subject, name, intro, instructions, buttonText, buttonColor, redirectLink } =
+      job.data;
+    await sendMail(to, subject, name, intro, instructions, buttonText, buttonColor, redirectLink)();
   },
   { connection },
 );

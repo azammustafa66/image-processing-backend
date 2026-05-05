@@ -3,9 +3,9 @@ import jwt from 'jsonwebtoken';
 import type { Request } from 'express';
 
 import { User } from '../models/user.model';
+import { emailQueue } from '../jobs/emailQueue';
 import type { AuthenticatedRequest } from '../types';
-import { APIError, APIResponse, options } from '../utils';
-import { asyncHandler } from '../utils/asyncHandler';
+import { APIError, APIResponse, asyncHandler, options } from '../utils';
 
 const isMobileClient = (req: Request) =>
   req.useragent?.isMobile || req.header('X-Client-Type') === 'mobile';
@@ -17,11 +17,7 @@ export const register = asyncHandler(async (req, res) => {
   if (doesExist) throw new APIError(409, 'User already exists. Please login.');
 
   const created = await User.create({ name, email, password });
-  const {
-    hashedToken,
-    unhashedToken: _unhashedToken,
-    tempTokenExpiry,
-  } = created.generateTempTokens();
+  const { hashedToken, unhashedToken, tempTokenExpiry } = created.generateTempTokens();
   const accessToken = created.generateAccessToken();
   const refreshToken = created.generateRefreshToken();
 
@@ -41,7 +37,16 @@ export const register = asyncHandler(async (req, res) => {
     ...safeUser
   } = created.toObject();
 
-  // TODO: Implement bullmq and send a welcome mail and a verify email
+  await emailQueue.add('SendRegisterEmail', {
+    to: email,
+    subject: 'Verify your email address',
+    name,
+    intro: 'Welcome! Please verify your email address to activate your account.',
+    instructions: 'Click the button below to verify your email:',
+    buttonColor: '#22BC66',
+    buttonText: 'Verify Email',
+    redirectLink: `${process.env.APP_URL}/api/v1/auth/verify-email/${unhashedToken}`,
+  });
 
   return res
     .status(201)

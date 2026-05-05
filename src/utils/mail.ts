@@ -14,6 +14,7 @@ function emailGenerator(
   intro: string,
   instructions: string,
   buttonText: string,
+  buttonColor: string,
   redirectLink: string,
 ) {
   return {
@@ -23,7 +24,7 @@ function emailGenerator(
       action: {
         instructions,
         button: {
-          color: '#22BC66',
+          color: buttonColor,
           text: buttonText,
           link: redirectLink,
         },
@@ -51,10 +52,11 @@ export const sendMail =
     intro: string,
     instructions: string,
     buttonText: string,
+    buttonColor: string,
     redirectLink: string,
   ) =>
   async () => {
-    const email = emailGenerator(name, intro, instructions, buttonText, redirectLink);
+    const email = emailGenerator(name, intro, instructions, buttonText, buttonColor, redirectLink);
     const emailBody = mailGenerator.generate(email);
     const emailText = mailGenerator.generatePlaintext(email);
     await transporter.sendMail({
