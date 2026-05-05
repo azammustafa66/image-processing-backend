@@ -157,6 +157,13 @@ export const verifyMail = asyncHandler(async (req, res) => {
   user.emailVerificationTokenExpiry = null;
   await user.save({ validateBeforeSave: false });
 
+  await emailQueue.add('SendRegisterEmail', {
+    to: user.email,
+    subject: "You've successfully verified your email address",
+    name: user.name,
+    intro: 'Thank you for verifying your email. Now your account is more secure',
+  });
+
   return res.status(200).json(new APIResponse(200, {}, 'Email verified successfully'));
 });
 
@@ -165,13 +172,23 @@ export const resendEmailVerification = asyncHandler(async (req: AuthenticatedReq
 
   const user = (await User.findById(req.user._id))!;
 
-  const { unhashedToken: _unhashedToken, hashedToken, tempTokenExpiry } = user.generateTempTokens();
+  const { unhashedToken, hashedToken, tempTokenExpiry } = user.generateTempTokens();
 
   user.emailVerificationToken = hashedToken;
   user.emailVerificationTokenExpiry = tempTokenExpiry;
   await user.save({ validateBeforeSave: false });
 
-  // TODO: send verification email containing unhashedToken
+  await emailQueue.add('ResendVerificationEmail', {
+    to: user.email,
+    subject: 'Verify your email address',
+    name: user.name,
+    intro:
+      'You requested a new verification email. Click the button below to verify your email address.',
+    instructions: 'Click the button below to verify your email:',
+    buttonColor: '#22BC66',
+    buttonText: 'Verify Email',
+    redirectLink: `${req.protocol}://${req.host}:${process.env.PORT}/api/v1/auth/verify-email/${unhashedToken}`,
+  });
 
   return res.status(200).json(new APIResponse(200, {}, 'Verification email sent'));
 });
@@ -182,15 +199,25 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) throw new APIError(400, 'User with the email does not exist');
 
-  const { unhashedToken: _unhashedToken, hashedToken, tempTokenExpiry } = user.generateTempTokens();
+  const { unhashedToken, hashedToken, tempTokenExpiry } = user.generateTempTokens();
 
   user.forgotPasswordToken = hashedToken;
   user.forgotPasswordTokenExpiry = tempTokenExpiry;
   await user.save({ validateBeforeSave: false });
 
-  // TODO: send forgot password email containing unhashedToken
+  await emailQueue.add('ForgotPasswordEmail', {
+    to: user.email,
+    subject: 'Reset your password',
+    name: user.name,
+    intro:
+      'You requested a password reset. Click the button below to set a new password. This link expires in 20 minutes.',
+    instructions: 'Click the button below to reset your password:',
+    buttonColor: '#FF6B6B',
+    buttonText: 'Reset Password',
+    redirectLink: `${req.protocol}://${req.host}:${process.env.PORT}/api/v1/auth/reset-password/${unhashedToken}`,
+  });
 
-  return res.status(200).json(new APIResponse(200, {}, 'Verification email sent'));
+  return res.status(200).json(new APIResponse(200, {}, 'Password reset email sent'));
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
@@ -209,7 +236,13 @@ export const resetPassword = asyncHandler(async (req, res) => {
   user.forgotPasswordTokenExpiry = null;
   await user.save({ validateBeforeSave: true });
 
-  // TODO: send password reset successfull email
+  await emailQueue.add('ResetPasswordSuccessMail', {
+    to: user.email,
+    subject: 'Your password has been reset successfully',
+    name: user.name,
+    intro:
+      'Your password has been changed successfully. If you did not make this change, please contact support immediately.',
+  });
 
   return res.status(200).json(new APIResponse(200, {}, 'Password changed successfully'));
 });

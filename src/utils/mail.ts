@@ -12,23 +12,30 @@ const mailGenerator = new Mailgen({
 function emailGenerator(
   name: string,
   intro: string,
-  instructions: string,
-  buttonText: string,
-  buttonColor: string,
-  redirectLink: string,
+  instructions?: string,
+  buttonText?: string,
+  buttonColor?: string,
+  redirectLink?: string,
 ) {
+  const action =
+    instructions && buttonText && redirectLink
+      ? {
+          action: {
+            instructions,
+            button: {
+              color: buttonColor ?? '#3869D4',
+              text: buttonText,
+              link: redirectLink,
+            },
+          },
+        }
+      : {};
+
   return {
     body: {
       name,
       intro,
-      action: {
-        instructions,
-        button: {
-          color: buttonColor,
-          text: buttonText,
-          link: redirectLink,
-        },
-      },
+      ...action,
       outro: `Need help, or have questions? Just reply to this email, we'd love to help.`,
     },
   };
@@ -50,10 +57,10 @@ export const sendMail =
     subject: string,
     name: string,
     intro: string,
-    instructions: string,
-    buttonText: string,
-    buttonColor: string,
-    redirectLink: string,
+    instructions?: string,
+    buttonText?: string,
+    buttonColor?: string,
+    redirectLink?: string,
   ) =>
   async () => {
     const email = emailGenerator(name, intro, instructions, buttonText, buttonColor, redirectLink);

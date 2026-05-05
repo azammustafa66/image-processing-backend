@@ -93,6 +93,15 @@ REDIS_PASSWORD=
 
 # Multer
 MAX_UPLOAD_SIZE_MB=25
+
+# Email (Mailtrap)
+MAILTRAP_HOST=sandbox.smtp.mailtrap.io
+MAILTRAP_PORT=587
+MAILTRAP_USER=
+MAILTRAP_PASS=
+MAILTRAP_FROM=noreply@yourapp.com
+APP_NAME=Image Processing App
+APP_URL=http://localhost:3000
 ```
 
 ## Getting Started
