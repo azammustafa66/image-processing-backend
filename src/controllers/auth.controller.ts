@@ -95,11 +95,7 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req: AuthenticatedRequest, res) => {
-  await User.findByIdAndUpdate(
-    req.user._id,
-    { $set: { refreshToken: null } },
-    { returnDocument: 'after' },
-  );
+  await User.findByIdAndUpdate(req.user._id, { $set: { refreshToken: null } });
 
   return res
     .status(200)

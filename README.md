@@ -106,28 +106,28 @@ bun index.ts
 
 ### Auth — `/api/v1/auth`
 
-| Method | Endpoint                      | Auth | Description               |
-| ------ | ----------------------------- | ---- | ------------------------- |
-| POST   | `/register`                   | —    | Register new user         |
-| POST   | `/login`                      | —    | Login                     |
-| POST   | `/refresh-token`              | —    | Rotate refresh token      |
-| POST   | `/logout`                     | ✓    | Logout                    |
-| PATCH  | `/verify-email/:token`        | —    | Verify email              |
-| POST   | `/resend-email-verification`  | ✓    | Resend verification email |
-| POST   | `/forgot-password`            | —    | Request password reset    |
-| PATCH  | `/reset-password/:token`      | —    | Reset password            |
+| Method | Endpoint                     | Auth | Description               |
+| ------ | ---------------------------- | ---- | ------------------------- |
+| POST   | `/register`                  | —    | Register new user         |
+| POST   | `/login`                     | —    | Login                     |
+| POST   | `/refresh-token`             | —    | Rotate refresh token      |
+| POST   | `/logout`                    | ✓    | Logout                    |
+| PATCH  | `/verify-email/:token`       | —    | Verify email              |
+| POST   | `/resend-email-verification` | ✓    | Resend verification email |
+| POST   | `/forgot-password`           | —    | Request password reset    |
+| PATCH  | `/reset-password/:token`     | —    | Reset password            |
 
 ### Images — `/api/v1/images`
 
 All image routes require a Bearer token.
 
-| Method | Endpoint        | Description                                       |
-| ------ | --------------- | ------------------------------------------------- |
-| GET    | `/`             | List images (paginated)                           |
-| POST   | `/`             | Upload image (multipart `image` field)            |
-| GET    | `/:id`          | Get image by ID                                   |
-| DELETE | `/:id`          | Delete image + all its transforms from S3 and DB  |
-| POST   | `/:id/transform`| Transform image                                   |
+| Method | Endpoint         | Description                                      |
+| ------ | ---------------- | ------------------------------------------------ |
+| GET    | `/`              | List images (paginated)                          |
+| POST   | `/`              | Upload image (multipart `image` field)           |
+| GET    | `/:id`           | Get image by ID                                  |
+| DELETE | `/:id`           | Delete image + all its transforms from S3 and DB |
+| POST   | `/:id/transform` | Transform image                                  |
 
 ### Transform Request Body
 
