@@ -15,7 +15,7 @@ const ALLOWED_MIME_TYPES: ImageMimeType[] = [
   'image/x-icon',
 ];
 
-const MAX_SIZE_BYTES = Number(process.env.MAX_UPLOAD_SIZE_MB ?? 25) * 1024 * 1024;
+const MAX_SIZE_BYTES = Number(process.env.MAX_UPLOAD_SIZE_MB ?? 10) * 1024 * 1024;
 
 export const upload = multer({
   storage: multer.memoryStorage(),

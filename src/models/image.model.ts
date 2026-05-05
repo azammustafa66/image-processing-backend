@@ -4,7 +4,7 @@ import { type IImage } from '../types';
 const imageSchema = new Schema<IImage>(
   {
     owner: { type: Types.ObjectId, ref: 'User', required: true },
-    originalURL: { type: String, required: true },
+    originalURL: { type: String, required: true, trim: true },
     filename: { type: String, required: true },
     mimetype: { type: String, required: true, default: 'image/jpeg' },
     size: { type: Number, required: true },

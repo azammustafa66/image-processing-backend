@@ -45,7 +45,7 @@ export const listImages = asyncHandler(async (req: AuthenticatedRequest, res) =>
   const limit = Math.min(100, Number(req.query['limit']) || 10);
   const skip = (page - 1) * limit;
 
-  const [data, total] = await Promise.all([
+  const [data, totalImages] = await Promise.all([
     Image.find({ owner: req.user._id }).skip(skip).limit(limit).sort({ createdAt: -1 }),
     Image.countDocuments({ owner: req.user._id }),
   ]);
@@ -55,7 +55,7 @@ export const listImages = asyncHandler(async (req: AuthenticatedRequest, res) =>
       200,
       {
         data,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+        pagination: { page, limit, totalImages, totalPages: Math.ceil(totalImages / limit) },
       },
       'Images fetched successfully',
     ),
