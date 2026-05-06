@@ -11,6 +11,7 @@ RUN mkdir -p /temp/prod
 COPY package.json bun.lock /temp/prod/
 RUN cd /temp/prod && bun install --frozen-lockfile --production
 
+RUN bun run build
 
 FROM base AS release
 
@@ -19,5 +20,5 @@ COPY --from=install /temp/prod/node_modules node_modules
 COPY . .
 
 USER bun
-EXPOSE 3000
+EXPOSE 3000/tcp
 ENTRYPOINT [ "bun", "run", "index.ts" ]
