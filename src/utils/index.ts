@@ -17,5 +17,5 @@ export {
   getPresignedUrl,
   s3,
   sendMail,
-  transporter
+  transporter,
 };

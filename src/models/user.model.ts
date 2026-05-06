@@ -49,7 +49,7 @@ userSchema.method('generateRefreshToken', function () {
 userSchema.method('generateTempTokens', function () {
   const unhashedToken = crypto.randomBytes(20).toString('hex');
   const hashedToken = crypto.createHash('sha512').update(unhashedToken).digest('hex');
-  const tempTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // expires in 15 mins.
+  const tempTokenExpiry = new Date(Date.now() + 20 * 60 * 1000); // expires in 15 mins.
 
   return { unhashedToken, hashedToken, tempTokenExpiry };
 });
