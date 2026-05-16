@@ -1,6 +1,6 @@
 import { Worker, Queue, type ConnectionOptions } from 'bullmq';
 
-import { sendMail } from '../utils';
+import { logger, sendMail } from '../utils';
 
 const connection: ConnectionOptions = {
   host: process.env.REDIS_HOST || '127.0.0.1',
@@ -27,14 +27,13 @@ export const emailWorker = new Worker(
 );
 
 emailWorker.on('completed', (job) => {
-  console.log(`[Job ${job.id}] Email sent successfully`);
+  logger.info('Email sent successfully', { jobId: job.id });
 });
 
 emailWorker.on('failed', (job, err) => {
-  console.error(`[Job ${job?.id}] Failed after all retries: ${err.message}`);
+  logger.error('Email job failed after all retries', { jobId: job?.id, error: err.message });
 });
 
-// Connection/transport errors — not tied to a specific job
 emailWorker.on('error', (err) => {
-  console.error(`Email worker error: ${err.message}`);
+  logger.error('Email worker error', { error: err.message });
 });

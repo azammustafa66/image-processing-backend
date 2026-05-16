@@ -2,6 +2,7 @@ import { asyncHandler } from './asyncHandler';
 import APIError from './apiError';
 import APIResponse from './apiResponse';
 import { options } from './constants';
+import logger from './logger';
 import { transporter, sendMail } from './mail';
 import client from './redis';
 import { uploadFile, deleteFile, getPresignedUrl, s3 } from './storage';
@@ -11,6 +12,7 @@ export {
   APIError,
   APIResponse,
   client,
+  logger,
   options,
   uploadFile,
   deleteFile,
